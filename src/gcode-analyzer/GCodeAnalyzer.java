@@ -23,17 +23,23 @@ import java.util.*;
 import java.io.*;
 
 public class GCodeAnalyzer {
+  private static String usage = String.join("\n"
+    , "Usage: java GCodeAnalyzer [file.gcode]"
+  );
+
   public static void main(String[] args) throws IOException {
-    Scanner input = new Scanner(System.in);
-    System.out.print("G-Code to test (must be txt file format): ");
-    String testFile = input.next();
+    if(args.length < 1) {
+      System.out.println(usage);
+      System.exit(1);
+    }
+
     // store start code
     Preamble p = new Preamble();
-    p.load(testFile);
+    p.load(args[0]);
     p.write();
     // store instructions (the rest)
     Instructions instr = new Instructions();
-    instr.load(testFile);
+    instr.load(args[0]);
     instr.write();
 
     System.out.println("Testing instructions for non-decreasing z-values: ");
@@ -57,8 +63,9 @@ public class GCodeAnalyzer {
     // This is the scanner that looks through the entire text file
     Scanner seeker = new Scanner(new File(gCodeTextFile));
 
-    while(seeker.hasNextLine()) {
-      String line = seeker.nextLine();
+    String line;
+    LineNumberReader r = new LineNumberReader(new FileReader(gCodeTextFile));
+    while((line = r.readLine()) != null) {
       // we only care if this line has a G1 (move) command
       if (line.substring(0, 3).equals("G1 ")) {
         // This is the scanner that looks through tokens in the current line
@@ -74,6 +81,7 @@ public class GCodeAnalyzer {
             double currentZ = Double.parseDouble(part.substring(1));
             if (currentZ < z) {
               // we've found a case where a z index is less than a previous one.
+              System.out.println("Violation at line " + r.getLineNumber());
               return false;
             } else {
               // make sure to update currentZ and keep looking
