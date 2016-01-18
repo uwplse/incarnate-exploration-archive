@@ -8,7 +8,7 @@ classes: $(CLASSES:.java=.class)
 %.class: %.java
 	$(JAVAC) $<
 
-test:
+test: GCodeAnalyzer.class
 	./test.sh
 
 .PHONY: test
