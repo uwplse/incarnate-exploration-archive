@@ -7,8 +7,21 @@ for s in $(find ../.. -name '*.stl'); do
   printf "Slicing %s\n" "$s"
   slic3r "$s" -o "$g"
 
+  if [ $? -ne 0 ]; then
+    echo !!! ERROR !!!
+    echo "$s" did not correctly slice
+    exit 1
+  fi
+
   printf "Analyzing %s\n" "$s"
   java GCodeAnalyzer "$g"
+
+  if [ $? -ne 0 ]; then
+    echo
+    echo !!! ERROR !!!
+    echo gcode from "$s" did not pass analyzer
+    exit 1
+  fi
 
   # clean up
   rm -f "$g"
