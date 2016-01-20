@@ -3,11 +3,11 @@ import java.io.*;
 
 // prints to a new file, and stores the commands of a preamble (start code)
 public class Preamble extends GCode {
-   
+
    public Preamble() {
      super();
-   } 
-   
+   }
+
    // Pre : fileName exists
    // Post: loads start code commands into this Preamble object
    public void load(String fileName) throws IOException {
@@ -15,13 +15,13 @@ public class Preamble extends GCode {
      this.gcodeFileName = fileName;
      Scanner seeker = new Scanner(f);
      String line = "";
-     boolean start = false;     
+     boolean start = false;
      while (!start) {
        if (line.indexOf("start.gcode") != -1) {
          start = true;
        } else {
          line = seeker.nextLine();
-       }   
+       }
      }
      while (start && seeker.hasNextLine()) {
        if (line.indexOf("end of start.gcode") != -1) {
@@ -29,9 +29,9 @@ public class Preamble extends GCode {
        }
        this.commands.add(line);
        line = seeker.nextLine();
-     }    
+     }
    }
-   
+
    // Pre : this Preamble has a valid file name
    // Post: writes this Preamble's commands to a new txt file with -p added to source gcode
    public void write() throws IOException {
@@ -41,9 +41,9 @@ public class Preamble extends GCode {
     }
     writer.close();
   }
-  
+
   // returns txt file name in the format of "sourceFileName-p.txt"
   public String pName() {
     return gcodeFileName.substring(0, gcodeFileName.lastIndexOf("."))	+ "-p.txt";
   }
-}   
+}
