@@ -37,6 +37,7 @@ public class GCodeAnalyzer {
     Preamble p = new Preamble();
     p.load(args[0]);
     p.write();
+    
     // store instructions (the rest)
     Instructions instr = new Instructions();
     instr.load(args[0]);

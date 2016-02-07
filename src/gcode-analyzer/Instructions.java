@@ -15,7 +15,7 @@ public class Instructions extends GCode {
     boolean start =	false;
     while (!start) {
  	    if (line.indexOf("end of start.gcode") != -1) {
- 		    start	= true;
+ 		    start = true;
  	    }
  	    line = seeker.nextLine();
     }
