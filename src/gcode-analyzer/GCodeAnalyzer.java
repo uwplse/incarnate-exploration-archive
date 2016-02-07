@@ -1,7 +1,5 @@
 /*
-Author: Melissa Medsker-Galloway
 PLSE Incarnate Project
-Last Edited: 01.15.16 21:11
 A basic G-Code analyzer to look at G-Code (currently reads corresponding
 txt files) and analyze it.
 
