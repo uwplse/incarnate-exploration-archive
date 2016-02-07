@@ -10,6 +10,7 @@ public class Preamble extends GCode {
 
    // Pre : fileName exists
    // Post: loads start code commands into this Preamble object
+   // Loads the preamble up to the end tag "(</extruderInitialization>)"
    public void load(String fileName) throws IOException {
      File f = new File(fileName);
      this.gcodeFileName = fileName;
@@ -24,7 +25,7 @@ public class Preamble extends GCode {
        }
      }
      while (start && seeker.hasNextLine()) {
-       if (line.indexOf("end of start.gcode") != -1) {
+       if (line.indexOf("/extruderInitialization") != -1) {
          start = false;
        }
        this.commands.add(line);
