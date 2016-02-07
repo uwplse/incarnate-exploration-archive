@@ -21,7 +21,6 @@ public class GCodeObject {
 		this.instr.write();
 		
 		this.preamble.write();
-		System.out.println(this.preamble.toString());
 		this.endCode.write();
 		
 	}
