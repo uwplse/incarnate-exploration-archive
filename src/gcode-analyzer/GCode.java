@@ -1,11 +1,23 @@
 import java.util.*;
 
-// Parent class of all GCode subclasses. Contains arraylist of commands.
 public class GCode {
   protected List<String> commands;
   protected String gcodeFileName;
 
-  public GCode() {
-    this.commands = new ArrayList<String>();
+	public GCode(String fileName)	{
+		this.gcodeFileName = fileName;
+	  this.commands = new ArrayList<String>();
   }
+
+	public String toString() {
+	  String result = "";
+	  for (String line : commands) {
+	  	result += line + "\n";
+	  }
+	  return result;
+	}
+
+	public void add(String line) {
+		this.commands.add(line);
+	}
 }
