@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# NOTE! assumes user runs from this dir
+
 # find all stl in repo, slice it, then test gcode
 for s in $(find ../.. -name '*.stl'); do
   g="$(mktemp -t $(basename "$s" .stl)).gcode"
@@ -8,6 +10,7 @@ for s in $(find ../.. -name '*.stl'); do
   slic3r "$s" -o "$g"
 
   if [ $? -ne 0 ]; then
+    echo
     echo !!! ERROR !!!
     echo "$s" did not correctly slice
     exit 1

@@ -1,17 +1,20 @@
 JAVAC = javac
 
-CLASSES = \
-	GCodeAnalyzer.java
+SRC = GCodeAnalyzer.java
+CLASS = $(SRC:.java=.class)
 
-classes: $(CLASSES:.java=.class)
+classes: $(CLASS)
 
 %.class: %.java
 	$(JAVAC) $<
 
-test: GCodeAnalyzer.class
+test: $(CLASS)
 	./test.sh
 
-.PHONY: test
+test-slic3r: $(CLASS)
+	./test-slic3r.sh
 
 clean:
 	rm -f *.class
+
+.PHONY: classes test test-slic3r clean
