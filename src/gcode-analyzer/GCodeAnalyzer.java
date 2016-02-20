@@ -5,12 +5,12 @@ txt files) and analyze it.
 
 Current features:
    creates Preamble and Instructions objects for separating gCode
-  
+
    testZ tests whether z-indices are non-decreasing, so that the extruder head
    is never decreasing its z position during a print.
-   
+
 To do:
-   Check preamble code. Currently this program doesn't always work with 
+   Check preamble code. Currently this program doesn't always work with
    preamble code when Z is initially set to a negative value.
    Make 'Instruction' classes, N-code and 'unknown' subclasses
    Store G-Code in a List(s)
@@ -41,8 +41,8 @@ public class GCodeAnalyzer {
                             " that subsequent Z values are always nondecreasing.");
       }
    }
-   
-   // Pre : Given file name exists in local folder, and the associated file 
+
+   // Pre : Given file name exists in local folder, and the associated file
    //       is in standard G-code format.
    // Tests all G-code G1 move commands in given text file name.
    // If all subsequent Z movements are non-decreasing, then the
@@ -77,14 +77,13 @@ public class GCodeAnalyzer {
                   } else {
                      // make sure to update currentZ and keep looking
                      z = currentZ;
-                  }   
+                  }
                }
             }
-         }   
+         }
       }
       // if we've reached this point, all G1 Z-indices are nondecreasing, and thus
       // Z movements are considered valid
       return true;
-   }      
-}         
-               
+   }
+}
