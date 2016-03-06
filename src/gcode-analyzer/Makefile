@@ -1,3 +1,4 @@
+all: GCodeAnalyzer.class
 
 GCodeAnalyzer.class: GCodeAnalyzer.java
 	javac GCodeAnalyzer.java

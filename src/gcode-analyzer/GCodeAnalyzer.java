@@ -21,9 +21,9 @@ import java.util.*;
 import java.io.*;
 
 public class GCodeAnalyzer {
-  private static String usage = String.join("\n"
+  private static final String usage = String.join("\n"
     , "Usage: java GCodeAnalyzer [file.gcode]"
-  );
+    );
 
   public static void main(String[] args) throws IOException {
     if(args.length < 1) {
