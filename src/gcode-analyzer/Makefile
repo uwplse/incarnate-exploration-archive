@@ -1,6 +1,8 @@
+JSRC = $(wildcard *.java)
+
 all: GCodeAnalyzer.class
 
-GCodeAnalyzer.class: GCodeAnalyzer.java
+GCodeAnalyzer.class: $(JSRC)
 	javac GCodeAnalyzer.java
 
 test: GCodeAnalyzer.class
