@@ -35,9 +35,9 @@ public class ZLevel {
 	public void printZLevel() {
 		System.out.println("Z index: " + this.zindex);
 		for(double x : this.xmap.keySet()) {
-			System.out.println("\tX coordinate: " + x);
+			System.out.format("\tX coordinate: %f%n", x);
 			for (double y : this.xmap.get(x)) {
-				System.out.println("\t\tY coordinate: " + y);
+				System.out.format("\t\tY coordinate: %f%n", y);
 			}
 		}
 	}
