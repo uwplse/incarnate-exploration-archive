@@ -10,7 +10,7 @@ public class GCode {
   // stores file name for this gcode information, without any commands
   // stored.
   public GCode(String fileName)  {
-    this.gcodeFileName = fn;
+    this.gcodeFileName = fileName;
     this.commands = new ArrayList<String>();
   }
 
