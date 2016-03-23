@@ -40,21 +40,33 @@ public class GCodeObject {
 			}
 			this.preamble.add(line);
 			line = seeker.nextLine();
-		}
-		boolean end = false;
+  	}
+
+    // System.out.println();
+    // System.out.println("Command stats for Preamble:");
+    // this.preamble.process();
+
+    boolean end = false;
     // next, process gcode Instructions until end.gcode signal is reached
 		while (!end) {
 			if (line.indexOf("End.gcode") == -1) {
 				this.instr.add(line);
 				line = seeker.nextLine();
-			} else {
+	  	} else {
 				end = true;
 			}
 		}
+    // System.out.println();
+    // System.out.println("Command stats for Instructions:");
+    // this.instr.process();
+
     // finally, process end.gcode (EndCode) until eof
 		while (seeker.hasNextLine()) {
 			this.endCode.add(line);
 			line = seeker.nextLine();
 		}
+    // System.out.println();
+    // System.out.println("Command stats for EndCode:");
+    // this.endCode.process();
 	}
 }
