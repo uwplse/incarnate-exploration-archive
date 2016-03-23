@@ -1,6 +1,8 @@
 import java.io.File;
 import java.util.Scanner;
 
+// stores gcode comments - we're not using this right now, but it's here if
+// we decide to filter them out of our code.
 public class Comments extends GCode {
 
 	public Comments(String fileName) {

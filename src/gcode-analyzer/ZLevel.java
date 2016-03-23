@@ -14,14 +14,14 @@ public class ZLevel {
   // constructs ZLevel with given zindex and no xy values
 	public ZLevel(double zindex) {
 		this.zindex = zindex;
-		this.xmap = new TreeMap<Double, TreeSet<Double>>();
+		this.xmap = new TreeMap<Double, Set<Double>>();
 	}
 
   // adds new xy pair to this ZLevel. If no y value for passed x value
   // exists, a new x coordinate is added to this plane. If xy pair already
   // exists in this ZLevel, the object remains unchanged.
   public void add(double x, double y) {
-		if (this.xmap(!containsKey(x)) {
+		if (!this.xmap.containsKey(x)) {
 			this.xmap.put(x, new TreeSet<Double>());
 		}
 		this.xmap.get(x).add(y);
