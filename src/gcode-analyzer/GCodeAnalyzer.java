@@ -33,13 +33,98 @@ public class GCodeAnalyzer {
 
     GCodeObject gc = new GCodeObject(args[0]);
 
-      System.out.println("Testing instructions for non-decreasing z-values: ");
-      if (testZ(gc.instr.instrName())) {
-         System.out.println("Z positions are valid.");
-      } else {
-         System.out.println("Not all Z positions are valid. Make sure" +
-                            " that subsequent Z values are always nondecreasing.");
+    System.out.println("Testing instructions for non-decreasing z-values: ");
+    if (testZ(gc.instr.instrName())) {
+      System.out.println("Z positions are valid.");
+    } else {
+      System.out.println("Not all Z positions are valid. Make sure" +
+                         " that subsequent Z values are always nondecreasing.");
+    }
+    System.out.println("Testing midair printing (prints over 'holes')");
+    testMidairPrinting(gc.instr.instrName());
+  }
+
+  public static void testMidairPrinting(String gCodeTextFile) throws IOException {
+    double currZ = 0.0;
+    Map<Double, ZLevel> zLevels = new TreeMap<Double, ZLevel>();
+    int countNoParams = 0;
+    Scanner seeker = new Scanner(new File(gCodeTextFile));
+    while (seeker.hasNextLine()) {
+      String line = seeker.nextLine();
+      if (line.substring(0, 3).equals("G1 ")) {
+        Scanner lineSeeker = new Scanner(line.substring(3));
+        // grab next token (ie. Z0.27 or E700)
+        if (lineSeeker.hasNext()) {
+          String next = lineSeeker.next();
+            if (next.startsWith("X")) {
+              // assuming G1 command thus has X Y Z parameters
+              double x = Double.parseDouble(next.substring(1));
+              next = lineSeeker.next();
+              double y = Double.parseDouble(next.substring(1));
+              next = lineSeeker.next();
+              double z = Double.parseDouble(next.substring(1));
+
+              if (currZ != z) {
+                if (!zLevels.containsKey(z)) {
+                  zLevels.put(z, new ZLevel(z));
+                }
+                // could maybe handle testZ with boolean zDecError =
+                // currentZ < z to improve efficiency
+              } else {
+                countNoParams++;
+              }
+              currZ = z;
+              zLevels.get(z).add(x, y);
+            }
+          }
+        }
       }
+      System.out.println(countNoParams + " instances of G1 commands without XYZ commands");
+      System.out.println();
+      System.out.println(zLevels.size() + " z levels processed:");
+      for (ZLevel z : zLevels.values()) {
+        z.printZLevel();
+      }
+      int errors = 0;// processZLevels(zLevels) (uncomment to see data printed for each layer);
+      if (errors == 0) {
+        System.out.println("For each z layer, all x and y coordinates are not printed over 'holes'");
+      } else {
+        System.out.println("There were " + errors + " errors total (check for holes).");
+      }
+    }
+
+   private static int processZLevels(Map<Double, ZLevel> zLevels) {
+      int holes = 0;
+      if (!zLevels.isEmpty()) {
+         ZLevel curr = null;
+         for (double z : zLevels.keySet()) {
+            ZLevel next = zLevels.get(z);
+            if (curr == null) {
+               curr = next;
+            } else {
+               Set<Double> xValues = next.getXValues();
+               for (double x : xValues) {
+                  if (!curr.containsX(x)) {
+                     System.out.println(x + " x coordinate at " + z + " Z Level but not at previous Z Level of z = " +
+                                        curr.getZIndex());
+                     holes++;
+                  } else {
+                     Set<Double> yValues = curr.getYValues(x);
+                     Set<Double> nextYValues = next.getYValues(x);
+                     for (double y : nextYValues) {
+                        if (!yValues.contains(y)) {
+                           System.out.println(y + " y coordinate at " + y + " Z Level but not at previous  Z Layer of z = " +
+                                              curr.getZIndex());
+                           holes++;
+                        }
+                     }
+                  }
+              }
+           }
+           curr = next;
+        }
+      }
+      return holes;
    }
 
    // Pre : Given file name exists in local folder, and the associated file

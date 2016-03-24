@@ -27,6 +27,11 @@ public class ZLevel {
 		this.xmap.get(x).add(y);
 	}
 
+  // returns whether the given x coordinate exists in this z level
+  public boolean containsX(double x) {
+    return this.xmap.containsKey(x);
+  }
+
   // returns z coordinate of this layer (e.g., 2.3)
 	public double getZIndex() {
 		return this.zindex;
@@ -61,11 +66,21 @@ public class ZLevel {
   //   ...
 	public void printZLevel() {
 		System.out.println("Z index: " + this.zindex);
-		for(double x : this.xmap.keySet()) {
-			System.out.format("\tX coordinate: %f%n", x);
+
+    for(double x : this.xmap.keySet()) {
+      System.out.println("\tX coordinate: " + x);
+      for (double y : this.xmap.get(x)) {
+        System.out.println("\t\tY coordinate: " + y);
+      }
+    }
+
+	  /* Commenting this out for truncating decimals during debugging
+     * (MG)
+      System.out.format("\tX coordinate: %f%n", x);
 			for (double y : this.xmap.get(x)) {
 				System.out.format("\t\tY coordinate: %f%n", y);
 			}
 		}
+    */
 	}
 }
