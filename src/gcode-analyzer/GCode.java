@@ -27,7 +27,7 @@ public class GCode {
       if (!command.startsWith("(") && !command.startsWith(";")) {
         command = command.split(" ")[0];
         if (!counts.containsKey(command)) {
-          counts.put(command, 1);
+          counts.put(command, 0);
         }
         counts.put(command, counts.get(command) + 1);
       }
