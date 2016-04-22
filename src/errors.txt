@@ -1,0 +1,26 @@
+Errors correctable with gcode:
+-Warping
+-Pillowing
+-Elephant's foot
+-Stringing
+-Ringing
+-Overhangs
+-Underextrusion
+-Walls not touching
+-Scratches
+-Randomly filled layers
+
+Classified based on root cause, ignoring machine factors (e.g. leveled bed):
+-Bad Model/Structure
+    -Warping
+    -Elephant's foot
+    -Randomly filled layers
+-Layer thickness
+    -Pillowing
+    -Ringing
+    -Overhangs
+-Extrusion/Retraction
+    -Stringing
+    -Underextrusion
+    -Walls not touching
+    -Scratches
