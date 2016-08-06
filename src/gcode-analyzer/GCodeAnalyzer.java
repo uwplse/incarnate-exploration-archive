@@ -1,174 +1,48 @@
-/*
-PLSE Incarnate Project
-A basic G-Code analyzer to look at G-Code (currently reads corresponding
-txt files) and analyze it.
-
-Current features:
-   creates Preamble and Instructions objects for separating gCode
-
-   testZ tests whether z-indices are non-decreasing, so that the extruder head
-   is never decreasing its z position during a print.
-
-To do:
-   Check preamble code. Currently this program doesn't always work with
-   preamble code when Z is initially set to a negative value.
-   Make 'Instruction' classes, N-code and 'unknown' subclasses
-   Store G-Code in a List(s)
-   ...
-*/
-
-import java.util.*;
 import java.io.*;
+import java.util.Queue;
 
+/* The GCodeAnalyzer (v2) processes and analyzes a GCode file and allows a user
+ * to run tests on the validity of the code corresponding to directions for a 3D
+ * printer. Currently, this version supports testing for the following:
+ *
+ * Slicers: Slicer3D
+ * Printers: Wanhao Duplicator6
+ * Printing Material: PLA 
+ *
+ */
 public class GCodeAnalyzer {
-  private static final String usage = String.join("\n"
-    , "Usage: java GCodeAnalyzer [file.gcode]"
-    );
 
-  public static void main(String[] args) throws IOException {
-    if(args.length < 1) {
-      System.out.println(usage);
-      System.exit(1);
-    }
-
-    GCodeObject gc = new GCodeObject(args[0]);
-
-    System.out.println("Testing instructions for non-decreasing z-values: ");
-    if (testZ(gc.instr.instrName())) {
-      System.out.println("Z positions are valid.");
+  public static void main(String[] args) throws FileNotFoundException {
+    String filename = "";
+    if (args.length > 0) {
+      filename = args[0];
     } else {
-      System.out.println("Not all Z positions are valid. Make sure" +
-                         " that subsequent Z values are always nondecreasing.");
+      filename = "boat.txt";
     }
-    System.out.println("Testing midair printing (prints over 'holes')");
-    testMidairPrinting(gc.instr.instrName());
+    GCodeObject gcode = new GCodeObject(filename);
+    Queue<ParamCommand> moveCommands = gcode.getMoveCommands();
+    System.out.println("Testing Non-decreasing Z-values in " + filename + ":");
+    boolean validZValues = hasNonDecreasingZValues(moveCommands);
   }
 
-  public static void testMidairPrinting(String gCodeTextFile) throws IOException {
-    double currZ = 0.0;
-    Map<Double, ZLevel> zLevels = new TreeMap<Double, ZLevel>();
-    int countNoParams = 0;
-    Scanner seeker = new Scanner(new File(gCodeTextFile));
-    while (seeker.hasNextLine()) {
-      String line = seeker.nextLine();
-      if (line.substring(0, 3).equals("G1 ")) {
-        Scanner lineSeeker = new Scanner(line.substring(3));
-        // grab next token (ie. Z0.27 or E700)
-        if (lineSeeker.hasNext()) {
-          String next = lineSeeker.next();
-            if (next.startsWith("X")) {
-              // assuming G1 command thus has X Y Z parameters
-              double x = Double.parseDouble(next.substring(1));
-              next = lineSeeker.next();
-              double y = Double.parseDouble(next.substring(1));
-              next = lineSeeker.next();
-              double z = Double.parseDouble(next.substring(1));
-
-              if (currZ != z) {
-                if (!zLevels.containsKey(z)) {
-                  zLevels.put(z, new ZLevel(z));
-                }
-                // could maybe handle testZ with boolean zDecError =
-                // currentZ < z to improve efficiency
-              } else {
-                countNoParams++;
-              }
-              currZ = z;
-              zLevels.get(z).add(x, y);
-            }
-          }
+  /* Returns whether the Z-values of the passed Queue of commands are sorted in ascending
+   * order. Commands without Z-value parameters will be ignored. */
+  public static boolean hasNonDecreasingZValues(Queue<ParamCommand> moveCommands) {
+    double currentZ = 0.0;
+    for (int i = 0; i < moveCommands.size(); i++) {
+      ParamCommand next = moveCommands.remove();
+      if (next.hasParam('Z')) {
+        if (next.getParamValue('Z') < currentZ) {
+          System.out.println("TEST FAILED: Move Command #" + i);
+          System.out.println("Current Z-value was : " + currentZ);
+          System.out.println("Next Z-value was : " + next.getParamValue('Z'));
+          return false;
+        } else {
+          currentZ = next.getParamValue('Z');
         }
-      }
-      System.out.println(countNoParams + " instances of G1 commands without XYZ commands");
-      System.out.println();
-      System.out.println(zLevels.size() + " z levels processed:");
-      for (ZLevel z : zLevels.values()) {
-        z.printZLevel();
-      }
-      int errors = 0;// processZLevels(zLevels) (uncomment to see data printed for each layer);
-      if (errors == 0) {
-        System.out.println("For each z layer, all x and y coordinates are not printed over 'holes'");
-      } else {
-        System.out.println("There were " + errors + " errors total (check for holes).");
       }
     }
-
-   private static int processZLevels(Map<Double, ZLevel> zLevels) {
-      int holes = 0;
-      if (!zLevels.isEmpty()) {
-         ZLevel curr = null;
-         for (double z : zLevels.keySet()) {
-            ZLevel next = zLevels.get(z);
-            if (curr == null) {
-               curr = next;
-            } else {
-               Set<Double> xValues = next.getXValues();
-               for (double x : xValues) {
-                  if (!curr.containsX(x)) {
-                     System.out.println(x + " x coordinate at " + z + " Z Level but not at previous Z Level of z = " +
-                                        curr.getZIndex());
-                     holes++;
-                  } else {
-                     Set<Double> yValues = curr.getYValues(x);
-                     Set<Double> nextYValues = next.getYValues(x);
-                     for (double y : nextYValues) {
-                        if (!yValues.contains(y)) {
-                           System.out.println(y + " y coordinate at " + y + " Z Level but not at previous  Z Layer of z = " +
-                                              curr.getZIndex());
-                           holes++;
-                        }
-                     }
-                  }
-              }
-           }
-           curr = next;
-        }
-      }
-      return holes;
-   }
-
-   // Pre : Given file name exists in local folder, and the associated file
-   //       is in standard G-code format.
-   // Tests all G-code G1 move commands in given text file name.
-   // If all subsequent Z movements are non-decreasing, then the
-   // Z movements for the G-Code are considered valid.
-   public static boolean testZ(String gCodeTextFile) throws IOException {
-      // sets initial z index. *This may need to change depending on how
-      // we work with preamble code, which may start with negative z index.
-      double z = 0;
-      // This is the scanner that looks through the entire text file
-      Scanner seeker = new Scanner(new File(gCodeTextFile));
-      int count = 0;
-      while(seeker.hasNextLine()) {
-         String line = seeker.nextLine();
-         count++;
-         // we only care if this line has a G1 (move) command
-         if (line.substring(0, 3).equals("G1 ")) {
-            // This is the scanner that looks through tokens in the current line
-            Scanner lineSeeker = new Scanner(line);
-            while (lineSeeker.hasNext()) {
-               // grab next token (ie. Z0.27 or E700)
-               String part = lineSeeker.next();
-               // we only care if this term works with the z-index. Z's without
-               // a given index are ignored *need to check what these actually do*
-               // *need to check if lower-case z's are valid*
-               if (part.startsWith("Z") && part.length() > 1) {
-                  // take the associated z-index with this Z
-                  double currentZ = Double.parseDouble(part.substring(1));
-                  if (currentZ < z) {
-                  		System.out.print(count);
-                     // we've found a case where a z index is less than a previous one.
-                     return false;
-                  } else {
-                     // make sure to update currentZ and keep looking
-                     z = currentZ;
-                  }
-               }
-            }
-         }
-      }
-      // if we've reached this point, all G1 Z-indices are nondecreasing, and thus
-      // Z movements are considered valid
-      return true;
-   }
+    System.out.println("TEST PASSED!");
+    return true;
+  }
 }
