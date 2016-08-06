@@ -1,16 +1,25 @@
 import java.util.*;
 import java.io.*;
 
+/* The GCodeObject stores commands associated with a gcode file (in .gcode or
+ * .txt formats), where commands are listed in sequential order per line in the
+ * file.
+ */
 public class GCodeObject {
+  // Commands without parameters - usually indicating whether a state is set for
+  // the print (e.g., metric units)
+  private Set<String> booleanCommands;
+  // G0/G1 (primary movement) Commands for processing
+  private Queue<ParamCommand> moveCommands;
+  // Commands with parameters (e.g., "G1 X1.0 Y2.0 Z1.2")
+  private Map<String, List<ParamCommand>> paramCommands;
 
-  protected Map<String, List<ParamCommand>> paramCommands;
-  protected Set<String> booleanCommands;
-  protected Queue<ParamCommand> moveCommands;
-
+  // Constructs a GCodeObject representing the state of file associated with the passed GCode
+  // filename (in .txt or .gcode formats)
   public GCodeObject(String filename) throws FileNotFoundException {
-    this.paramCommands = new TreeMap<String, List<ParamCommand>>();
     this.booleanCommands = new TreeSet<String>();
     this.moveCommands = new LinkedList<ParamCommand>();
+    this.paramCommands = new TreeMap<String, List<ParamCommand>>();
     Scanner seeker = new Scanner(new File(filename));  
     boolean instructions = false;
     while (seeker.hasNextLine()) {
@@ -47,7 +56,9 @@ public class GCodeObject {
     return this.moveCommands;
   }
 
-  public void printQueue() {
+  /* Prints G0/G1 commands in order they were found in gcode file (helpful
+   * for debugging purposes) */
+  public void printZMoveCommands() {
     for (int i = 0; i < this.moveCommands.size(); i++) {
       ParamCommand next = this.moveCommands.remove();
       if (next.hasParam('Z')) {
@@ -57,6 +68,11 @@ public class GCodeObject {
     }
   }
 
+  /* Returns String representation of this GCodeObject, in the following format:
+   *   X occurances of Y command
+   *   Z is set
+   * where each command X with parameter Y in this GCodeObject is printed first,
+   * followed by each command Z set without parameters. */
   public String toString() {
     String result = "";
     for (String s : this.paramCommands.keySet()) {

@@ -1,19 +1,16 @@
 import java.util.*;
 
-// The ParamCommand represents a G-Code Command which has both a code value
-// (e.g., "G1" or "M20") and parameters for that command (e.g., "X1.2")
+/* The ParamCommand represents a G-Code Command which has both a code value
+ * (e.g., "G1" or "M20") and parameters for that command (e.g., "X1.2") */
 public class ParamCommand {
-  protected String code; // e.g., "G1"
-  protected Map<Character, Double> params; // e.g., 'X' -> 1.2, 'Y' -> 2.0
+  private String code; // e.g., "G1"
+  private Map<Character, Double> params; // e.g., 'X' -> 1.2, 'Y' -> 2.0
 
-  /* Pre : 
-   * - code != null && params != null, otherwise throws
-   * IllegalArgumentException
-   * - Parameters are in the format of : 'Nnn' where 'N' is the single-letter
-   * command and 'nn' is some numerical value
-   *
+  /* Pre : code != null && params != null, otherwise throws IllegalArgumentException
+   *       Parameters are in the format of : 'Nnn' where 'N' is the single-letter
+   *       command and 'nn' is some numerical value
    * Post: Constructs a ParamCommand with given code (e.g., "G1") and String of params
-   * (e.g., "X1.2 Y2.0") */
+   *       (e.g., "X1.2 Y2.0") */
   public ParamCommand(String code, String params) {
     if (code == null || params == null) {
       throw new IllegalArgumentException("ParamCommand requires code with at least one parameter");
@@ -21,7 +18,7 @@ public class ParamCommand {
     this.params = new TreeMap<Character, Double>();
     this.code = code;
 
-    // only consider code before potential comments
+    // only consider code before comments, if present
     String[] parts = params.split(" "); // ["X1.2", "Y2.0"]
     for (String part : parts) {
       char paramType = part.charAt(0);
@@ -36,15 +33,19 @@ public class ParamCommand {
     }
   }
 
-  /* Returns this GCode command name (e.g., "G1") */
+  /* Returns this GCode command name as String (e.g., "G1") */
   public String getCommandName() {
     return this.code;
   }
 
-  /* Returns String representation of this Command with its code signature and
-   * associated parameters */
-  public String toString() {
-    return this.code + ": " + this.params.toString();
+  /* Pre : this ParamCommand has given paramType as a parameter, otherwise throws
+   *       IllegalArgumentException
+   * Post: Returns value associated with the given paramType */
+  public double getParamValue(char paramType) {
+    if (!this.params.containsKey(paramType)) {
+      throw new IllegalArgumentException("This ParamCommand does not have given " + paramType + " parameter");
+    }
+    return this.params.get(paramType);
   }
 
   /* Returns a Map representing each of this GCode command's parameters and
@@ -58,7 +59,9 @@ public class ParamCommand {
     return this.params.containsKey(paramType);
   }
 
-  public double getParamValue(char paramType) {
-    return this.params.get(paramType);
+  /* Returns String representation of this Command with its code signature and
+   * associated parameters */
+  public String toString() {
+    return this.code + ": " + this.params.toString();
   }
 }
