@@ -22,7 +22,7 @@ public class ParamCommand {
     this.code = code;
 
     // only consider code before potential comments
-    String[] parts = params.split(";")[0].split(" "); // ["X1.2", "Y2.0"]
+    String[] parts = params.split(" "); // ["X1.2", "Y2.0"]
     for (String part : parts) {
       char paramType = part.charAt(0);
       if (!part.substring(1).contains(";") && !Character.isLetter(part.charAt(1))) {

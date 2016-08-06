@@ -12,12 +12,13 @@ public class GCodeObject {
     this.booleanCommands = new TreeSet<String>();
     this.moveCommands = new LinkedList<ParamCommand>();
     Scanner seeker = new Scanner(new File(filename));  
-    boolean instructions = false;;
+    boolean instructions = false;
     while (seeker.hasNextLine()) {
       String line = seeker.nextLine();
       // filter out comments
-      if (!line.isEmpty() && line.charAt(0) != '(' && line.charAt(0) != ';') {
-        String[] parts = line.split(" ", 2);
+      if (!line.isEmpty() && line.charAt(0) != '(') {
+        // ignore anything after a ";" in a command
+        String[] parts = line.split(";")[0].split(" ", 2);
         String code = parts[0];
         if (code.equals("M117")) { // start of instructions
           instructions = true;
