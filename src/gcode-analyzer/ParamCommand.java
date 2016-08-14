@@ -21,7 +21,7 @@ public class ParamCommand extends Command {
     String[] parts = params.split(" "); // ["X1.2", "Y2.0"]
     for (String part : parts) {
       char paramType = part.charAt(0);
-      if (!part.substring(1).contains(";") && !Character.isLetter(part.charAt(1))) {
+      if (part.length() > 1 && !part.substring(1).contains(";") && !Character.isLetter(part.charAt(1))) {
         if (this.params.containsKey(paramType)) {
           throw new IllegalArgumentException("Duplicate " + paramType + 
             " parameters in " + code + " command.");
