@@ -5,7 +5,7 @@ import java.util.Queue;
  * to run tests on the validity of the code corresponding to directions for a 3D
  * printer. Currently, this version supports testing for the following:
  *
- * Slicers: Slicer3D
+ * Slicers: Simplify3D
  * Printers: Wanhao Duplicator6
  * Printing Material: PLA 
  *
@@ -21,6 +21,7 @@ public class GCodeAnalyzer {
     }
     GCodeObject gcode = new GCodeObject(filename);
     Queue<ParamCommand> moveCommands = gcode.getMoveCommands();
+    //System.out.println(gcode);
     System.out.println("Testing Non-decreasing Z-values in " + filename + ":");
     boolean validZValues = hasNonDecreasingZValues(moveCommands);
   }
@@ -29,11 +30,11 @@ public class GCodeAnalyzer {
    * order. Commands without Z-value parameters will be ignored. */
   public static boolean hasNonDecreasingZValues(Queue<ParamCommand> moveCommands) {
     double currentZ = 0.0;
-    for (int i = 0; i < moveCommands.size(); i++) {
-      ParamCommand next = moveCommands.remove();
+    int oldSize = moveCommands.size();
+    for (ParamCommand next : moveCommands) {
       if (next.hasParam('Z')) {
         if (next.getParamValue('Z') < currentZ) {
-          System.out.println("TEST FAILED: Move Command #" + i);
+          System.out.println("TEST FAILED: Move Command on Line #" + next.getLineNumber());
           System.out.println("Current Z-value was : " + currentZ);
           System.out.println("Next Z-value was : " + next.getParamValue('Z'));
           return false;
