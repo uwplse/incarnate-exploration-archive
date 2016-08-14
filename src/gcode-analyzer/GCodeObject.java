@@ -14,6 +14,8 @@ public class GCodeObject {
   // Commands with parameters (e.g., "G1 X1.0 Y2.0 Z1.2")
   private Map<String, List<ParamCommand>> paramCommands;
 
+  public static String instructionsEndPoints = "G28";
+
   // Constructs a GCodeObject representing the state of file associated with the passed GCode
   // filename (in .txt or .gcode formats)
   public GCodeObject(String filename) throws FileNotFoundException {
@@ -29,10 +31,10 @@ public class GCodeObject {
       // filter out comments
       if (!line.isEmpty() && line.charAt(0) != '(') {
         // ignore anything after a ";" in a command
-        String[] parts = line.split(";")[0].split(" ", 2);
+        String[] parts = line.split("[;(]")[0].split(" ", 2);
         String code = parts[0];
-        if (code.equals("M117")) { // start of instructions
-          instructions = true;
+        if (code.equals(instructionsEndPoints)) { // start or end of instructions
+          instructions = !instructions;
         }
         if (parts.length == 1) {
           if (!parts[0].trim().isEmpty()) {

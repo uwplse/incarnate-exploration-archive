@@ -20,14 +20,16 @@ public class ParamCommand extends Command {
     // only consider code before comments, if present
     String[] parts = params.split(" "); // ["X1.2", "Y2.0"]
     for (String part : parts) {
-      char paramType = part.charAt(0);
-      if (part.length() > 1 && !part.substring(1).contains(";") && !Character.isLetter(part.charAt(1))) {
-        if (this.params.containsKey(paramType)) {
-          throw new IllegalArgumentException("Duplicate " + paramType + 
+      if (!part.isEmpty()) {
+        char paramType = part.charAt(0);
+        if (part.length() > 1 && !Character.isLetter(part.charAt(1))) {
+          if (this.params.containsKey(paramType)) {
+            throw new IllegalArgumentException("Duplicate " + paramType + 
             " parameters in " + code + " command.");
+          }
+          double paramValue = Double.parseDouble(part.substring(1));
+          this.params.put(paramType, paramValue);
         }
-        double paramValue = Double.parseDouble(part.substring(1));
-        this.params.put(paramType, paramValue);
       }
     }
   }
