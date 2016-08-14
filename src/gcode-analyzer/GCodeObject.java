@@ -33,7 +33,9 @@ public class GCodeObject {
           instructions = true;
         }
         if (parts.length == 1) {
-          booleanCommands.add(code);
+          if (!parts[0].trim().isEmpty()) {
+            booleanCommands.add(code);
+          }
         } else {
           String params = parts[1];
           if (!paramCommands.containsKey(code)) {
@@ -53,7 +55,7 @@ public class GCodeObject {
    * were found in the original GCode file. Many slicers consider these similar,
    * if not identical, "move" commands in the xyz plane. */
   public Queue<ParamCommand> getMoveCommands() {
-    return this.moveCommands;
+    return new LinkedList<ParamCommand>(this.moveCommands);
   }
 
   /* Prints G0/G1 commands in order they were found in gcode file (helpful
