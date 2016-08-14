@@ -14,7 +14,7 @@ public class GCodeObject {
   // Commands with parameters (e.g., "G1 X1.0 Y2.0 Z1.2")
   private Map<String, List<ParamCommand>> paramCommands;
 
-  public static String instructionsEndPoints = "G28";
+  public static String START_END_POINTS = "G28";
 
   // Constructs a GCodeObject representing the state of file associated with the passed GCode
   // filename (in .txt or .gcode formats)
@@ -33,7 +33,7 @@ public class GCodeObject {
         // ignore anything after a ";" in a command
         String[] parts = line.split("[;(]")[0].split(" ", 2);
         String code = parts[0];
-        if (code.equals(instructionsEndPoints)) { // start or end of instructions
+        if (code.equals(START_END_POINTS)) { // start or end of instructions
           instructions = !instructions;
         }
         if (parts.length == 1) {
