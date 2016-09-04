@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 import java.util.Queue;
 
 /* The GCodeAnalyzer (v2) processes and analyzes a GCode file and allows a user
@@ -17,13 +18,12 @@ public class GCodeAnalyzer {
     if (args.length > 0) {
       filename = args[0];
     } else {
-      filename = "boat.txt";
+      filename = "cube4.gcode";
     }
     GCodeObject gcode = new GCodeObject(filename);
     Queue<ParamCommand> moveCommands = gcode.getMoveCommands();
-    //System.out.println(gcode);
+    System.out.println();
     System.out.println("Testing Non-decreasing Z-values in " + filename + ":");
-    boolean validZValues = hasNonDecreasingZValues(moveCommands);
   }
 
   /* Returns whether the Z-values of the passed Queue of commands are sorted in ascending

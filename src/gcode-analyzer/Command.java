@@ -1,3 +1,5 @@
+//package gcodeanalyzer;
+
 /* The Command class represents a G-Code Command which has both a code value
  * (e.g., "G1" or "M20"), line number */
 public class Command implements Comparable<Command> {
